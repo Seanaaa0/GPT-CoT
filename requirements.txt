@@ -1,0 +1,9 @@
+transformers>=4.38.0
+datasets>=2.16.0
+peft>=0.10.0
+accelerate>=0.23.0
+bitsandbytes>=0.41.0
+scipy
+torch>=2.1.0
+numpy
+tqdm
