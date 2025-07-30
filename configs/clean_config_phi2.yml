@@ -1,0 +1,62 @@
+base_model: /home/seana/axolotl_project/models/phi-2/phi2
+
+attn_implementation: "eager"
+
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+trust_remote_code: true
+
+special_tokens:
+  pad_token: "<|endoftext|>"
+
+datasets:
+  - path: /home/seana/axolotl_project/data/simple_10x10_1to2000.jsonl
+    type: alpaca
+
+val_set_size: 0.05
+
+adapter: lora
+peft_type: LORA
+lora_target_modules:
+  - qkv_proj
+  - out_proj
+  - dense
+  - dense_h_to_4h
+  - dense_4h_to_h
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+
+output_dir: /home/seana/axolotl_project/outputs/phi2-vec-finetune
+train_on_inputs: false
+group_by_length: false
+
+bf16: false
+fp16: false
+
+load_in_4bit: false
+load_in_8bit: true
+bnb_8bit_compute_dtype: float16
+use_bnb: true
+llm_int8_enable_fp32_cpu_offload: true
+
+
+
+optimizer: adamw_torch
+micro_batch_size: 1
+gradient_accumulation_steps: 4
+
+num_train_epochs: 3
+learning_rate: 2e-4
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+weight_decay: 0.01
+
+logging_steps: 10
+eval_steps: 100
+save_steps: 100
+save_strategy: steps
+save_total_limit: 2
+
+report_to: none
+seed: 42

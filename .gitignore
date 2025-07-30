@@ -1,0 +1,11 @@
+# 忽略模型與輸出資料夾
+models/
+outputs/
+
+# 忽略常見大檔案格式
+*.bin
+*.pt
+*.ckpt
+*.jsonl
+*.npy
+*.log
