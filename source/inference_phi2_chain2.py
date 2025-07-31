@@ -9,9 +9,9 @@ import os
 
 # === 設定 ===
 base_model_path = "/home/seana/axolotl_project/models/phi-2/phi2"
-lora_checkpoint_path = "/home/seana/axolotl_project/outputs/phi2-CoT-finetune2/checkpoint-75"
-test_data_path = "/home/seana/axolotl_project/data/cot_10x10_1550to1600.jsonl"
-output_save_path = "/home/seana/axolotl_project/source/test_output/phi2_chain_output7.jsonl"
+lora_checkpoint_path = "/home/seana/axolotl_project/outputs/phi2-CoT-finetune6/checkpoint-24"
+test_data_path = "/home/seana/axolotl_project/data/random_multi_3.jsonl"
+output_save_path = "/home/seana/axolotl_project/source/test_output/multi_test_3.jsonl"
 max_tokens = 512
 # 增加輸出長度以支援 chain-of-thought
 
@@ -41,7 +41,7 @@ os.makedirs(os.path.dirname(output_save_path), exist_ok=True)
 
 with open(test_data_path, "r", encoding="utf-8") as f:
     for i, line in enumerate(f):
-        if i >= 5:
+        if i >= 10:
             break
         data = json.loads(line)
         instruction = data["instruction"]
@@ -49,14 +49,13 @@ with open(test_data_path, "r", encoding="utf-8") as f:
         expected = data["output"].strip()
 
         prefix = (
-            "You are in a 10x10 grid. Start at position (0,0).\n"
-            "You are given a list of 2D vectors (dx, dy).\n"
-            "Please apply them one by one, and explain each step like this:\n"
-            "Start at (0,0)\n"
-            "Step 1: (0,0) + (+1,0) = (1,0)\n"
-            "Step 2: (1,0) + (+1,0) = (2,0)\n"
+            "You are in a 10x10 grid. The start position and a list of movement vectors are provided.\n"
+            "Apply each vector one by one and show the result of each step in the following format:\n"
+            "Start at (x,y)\n"
+            "Step 1: (x1,y1) + (dx1,dy1) = (x2,y2)\n"
+            "Step 2: (x2,y2) + (dx2,dy2) = (x3,y3)\n"
             "...\n"
-            "Please follow the same style step by step and finally print the final position.\n"
+            "Be careful to compute each step correctly based on the previous result.\n"
             "Final position: (x,y)\n\n"
         )
 

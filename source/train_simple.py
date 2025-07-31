@@ -13,18 +13,18 @@ def simple_greedy_policy(start, goal):
     while x != gx:
         if gx > x:
             x += 1
-            path.append("(+1,0)")
+            path.append({"vec": "(+1,0)", "word": "right"})
         else:
             x -= 1
-            path.append("(-1,0)")
+            path.append({"vec": "(-1,0)", "word": "left"})
 
     while y != gy:
         if gy > y:
             y += 1
-            path.append("(0,+1)")
+            path.append({"vec": "(0,+1)", "word": "down"})
         else:
             y -= 1
-            path.append("(0,-1)")
+            path.append({"vec": "(0,-1)", "word": "up"})
 
     return path
 

@@ -1,0 +1,49 @@
+base_model: /home/seana/axolotl_project/models/phi-2/phi2
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+
+load_in_4bit: true
+strict: false
+
+datasets:
+  - path: /home/seana/axolotl_project/data/nlp_10x10_multi_entre_shuffled.jsonl
+    type: alpaca
+
+val_set_size: 0.05 # 沒有驗證集
+adapter: lora
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - v_proj
+
+sequence_len: 512
+sample_packing: false
+pad_to_sequence_len: true
+
+output_dir: /home/seana/axolotl_project/outputs/phi2-NLP-finetune1
+
+# 載入先前 LoRA 訓練好的 adapter 權重
+adapter_path: outputs/phi2-CoT-finetune5/checkpoint-760
+
+gradient_accumulation_steps: 2
+micro_batch_size: 4
+num_epochs: 8
+optimizer: adamw_bnb_8bit
+
+lr_scheduler: cosine
+learning_rate: 2e-4
+train_on_inputs: false
+group_by_length: false
+
+bf16: false
+fp16: true
+tf32: true
+
+gradient_checkpointing: true
+early_stopping_patience: 0
+logging_steps: 10
+save_steps: 50
+special_tokens:
+  pad_token: "<|endoftext|>"
