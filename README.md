@@ -1,3 +1,4 @@
+
 # GPT-CoT
 
 A lightweight fine-tuning project using `phi-2` + LoRA to teach a model how to reason over a grid using Chain-of-Thought (CoT) and simple spatial reasoning.
@@ -59,29 +60,31 @@ pip install -r requirements.txt
 
 ---
 
-## 🧪 Inference Example
+## 🔄 August 2025 Updates
 
-Input:
-```
-Actions: (+1,0), (+1,0), (0,+1)
-```
+### 🧠 Label-based Reasoning Model
 
-Output from `phi2-CoT-finetune5`:
-```
-Start at (0,0)
-Step 1: (0,0) + (+1,0) = (1,0)
-Step 2: (1,0) + (+1,0) = (2,0)
-Step 3: (2,0) + (0,+1) = (2,1)
-Final position: (2,1)
-```
+- ✅ New fine-tuned model: `phi2-Label-finetune1`
+- 🔍 Task: Given a series of vector actions `(dx,dy)`, reason step-by-step to compute the final position and classify the path as one of:
+  - `correct`, `too short`, `too long`, `loop`, `out of bound`, `wrong`
+- 📁 Training data: `10x10_vec_labeled.jsonl`
+- 📜 Inference script: `inference_phi2_vec.py`
+- 📈 Accuracy: ~95%, supports full CoT + label correctness tracking
+- 🧪 Output example includes `"label"` and `"correct"` field for each prediction
+
+### 🌐 Interactive Web Interface
+
+- 🗺️ `map_interface.html`: displays a 10x10 grid and agent paths interactively
+- 🧩 `flask_api.py`: serves model predictions and links frontend ↔ backend
+- 🔧 Future integration with live inference and editing
 
 ---
 
 ## 📌 TODO
-- [x] Train LoRA on vector trace task
-- [x] NLP command version
-- [x] Multi-entry point generalization
-- [ ] Trace classification (valid/invalid)
+- [✅] Train LoRA on vector trace task
+- [✅] NLP command version
+- [✅] Multi-entry point generalization
+- [✅] Trace classification (valid/invalid)
 - [ ] Decision Transformer for path generation
 - [ ] Add goal-aware discriminator
 
