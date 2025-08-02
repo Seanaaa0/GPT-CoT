@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Maze Interface</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-size: cover;
+            background-position: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: auto;
+        }
+
+        td {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+        }
+
+        .agent {
+            background-color: lightgreen;
+        }
+
+        .path {
+            background-color: #ccc;
+        }
+
+        .goal {
+            background-color: lightcoral;
+        }
+
+        .truth {
+            background-color: deepskyblue;
+        }
+
+        .firework {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: url('https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif') center center no-repeat;
+            background-size: cover;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="firework" id="firework"></div>
+
+    <h2>🧭 Maze Action Interface</h2>
+    <label>Start X: <input type="number" id="startX" value="0" /></label>
+    <label>Start Y: <input type="number" id="startY" value="0" /></label>
+    <input type="file" id="bgUpload" accept="image/*" />
+    <br><br>
+
+    <table id="grid"></table>
+    <div style="margin-top: 10px;">
+        <h4>📋 Debug Log:</h4>
+        <pre id="debug" style="background:#eee;padding:8px;height:160px;overflow:auto;font-size:13px;"></pre>
+    </div>
+
+    <!-- 新增方向控制 -->
+    <div style="margin-bottom: 10px;">
+        <button onclick="move('up')">⬆️</button><br>
+        <button onclick="move('left')">⬅️</button>
+        <button onclick="move('down')">⬇️</button>
+        <button onclick="move('right')">➡️</button>
+    </div>
+
+    <button onclick="runGPT()">🚀 Run</button>
+    <button onclick="reset()">♻️ Reset</button>
+    <p>🏁 Final Position: <span id="final"></span></p>
+
+    <p><b>Current Actions:</b> <span id="actions"></span></p>
+    <p>⏱️ Time Elapsed: <span id="timer">0.0</span>s</p>
+    <h4>🧠 GPT Output:</h4>
+    <pre id="gptOutput"
+        style="background:#f8f8f8;padding:8px;height:160px;overflow:auto;font-size:13px;border:1px solid #ccc;"></pre>
+
+    <script>
+        const size = 10;
+        const grid = document.getElementById("grid");
+        let agentX = 0, agentY = 0;
+        let startX = 0, startY = 0;
+        let timerInterval = null;
+        let timeStart = null;
+        let currentActions = [];
+        let groundTruth = [9, 9]; // ✅ 這行會被自動更新，不再是寫死的
+
+        function createGrid() {
+            for (let i = 0; i < size; i++) {
+                const row = grid.insertRow();
+                for (let j = 0; j < size; j++) {
+                    row.insertCell();
+                }
+            }
+        }
+
+        function clearGrid() {
+            for (let row of grid.rows)
+                for (let cell of row.cells)
+                    cell.className = "";
+        }
+
+        function updateAgent() {
+            clearGrid();
+            grid.rows[agentY].cells[agentX].className = "agent";
+            grid.rows[groundTruth[1]].cells[groundTruth[0]].className = "truth";
+        }
+
+        function move(dir) {
+            currentActions.push(dir);
+            document.getElementById("actions").textContent = currentActions.join(", ");
+            if (dir === "up" && agentY > 0) agentY--;
+            if (dir === "down" && agentY < size - 1) agentY++;
+            if (dir === "left" && agentX > 0) agentX--;
+            if (dir === "right" && agentX < size - 1) agentX++;
+            updateAgent();
+        }
+
+        function reset() {
+            startX = parseInt(document.getElementById("startX").value);
+            startY = parseInt(document.getElementById("startY").value);
+            agentX = startX;
+            agentY = startY;
+            currentActions = [];
+            document.getElementById("actions").textContent = "";
+            document.getElementById("timer").textContent = "0.0";
+            document.getElementById("gptOutput").textContent = "";
+            document.getElementById("final").textContent = "";
+            clearInterval(timerInterval);
+            updateAgent();
+        }
+
+        function setButtonsDisabled(disabled) {
+            for (let dir of ["up", "down", "left", "right"]) {
+                document.querySelector(`button[onclick="move('${dir}')"]`).disabled = disabled;
+            }
+        }
+
+        function addLog(msg) {
+            const el = document.getElementById("debug");
+            const now = new Date().toLocaleTimeString();
+            el.textContent += `[${now}] ${msg}\n`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function runGPT() {
+            // ✅ 先記錄當下位置作為 ground truth
+            groundTruth = [agentX, agentY];
+
+            setButtonsDisabled(true);
+            agentX = startX;
+            agentY = startY;
+            updateAgent();
+
+            clearGrid();
+            grid.rows[groundTruth[1]].cells[groundTruth[0]].className = "truth";
+            grid.rows[agentY].cells[agentX].className = "agent";
+
+            const agentPos = [startX, startY];
+            addLog("📡 Sending start position and actions to backend...");
+
+            const response = await fetch("http://127.0.0.1:5000/inference", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    start: agentPos,
+                    actions: currentActions
+                })
+            });
+
+            if (!response.ok) {
+                addLog("❌ Backend failed with status " + response.status);
+                setButtonsDisabled(false);
+                return;
+            }
+
+            const result = await response.json();
+            const rawText = result.gpt_output || "";
+
+            document.getElementById("gptOutput").textContent = rawText;
+
+            const stepMatches = [...rawText.matchAll(/→\s*\((\d+),(\d+)\)/g)];
+            stepMatches.forEach(([_, x, y]) => {
+                const px = parseInt(x);
+                const py = parseInt(y);
+                if (px >= 0 && px < size && py >= 0 && py < size)
+                    grid.rows[py].cells[px].className = "path";
+            });
+
+            const match = rawText.match(/Final position:\s*\((\d+),(\d+)\)/);
+            if (match) {
+                const finalX = parseInt(match[1]);
+                const finalY = parseInt(match[2]);
+                document.getElementById("final").textContent = `${finalX},${finalY}`;
+                if (finalY >= 0 && finalY < size && finalX >= 0 && finalX < size)
+                    grid.rows[finalY].cells[finalX].className = "goal";
+
+                if (finalX === groundTruth[0] && finalY === groundTruth[1]) {
+                    document.getElementById("firework").style.display = "block";
+                    setTimeout(() => document.getElementById("firework").style.display = "none", 2500);
+                }
+            } else {
+                document.getElementById("final").textContent = "[Not found]";
+            }
+
+            setButtonsDisabled(false);
+        }
+
+        document.getElementById("bgUpload").addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    document.body.style.backgroundImage = `url('${event.target.result}')`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        window.onload = () => {
+            createGrid();
+            reset();
+        };
+    </script>
+</body>
+
+</html>
