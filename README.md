@@ -78,6 +78,22 @@ pip install -r requirements.txt
 - 🧩 `flask_api.py`: serves model predictions and links frontend ↔ backend
 - 🔧 Future integration with live inference and editing
 
+## 🔍 Trace Visualization Tool
+
+We provide a Python tool to visualize inference traces from test_label.jsonl.
+
+### ➤ Script: `generate_trace_images.py`
+
+This script will:
+- Parse GPT output traces
+- Generate per-sample visualizations
+- Combine up to 25 images into a grid
+
+### ✅ Usage
+```bash
+cd source/data/test_output
+python generate_trace_images.py
+
 ---
 
 ## 📌 TODO
