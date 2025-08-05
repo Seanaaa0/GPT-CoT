@@ -1,0 +1,53 @@
+base_model: /home/seana/axolotl_project/models/phi-2/phi2
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+
+load_in_4bit: true
+strict: false
+
+datasets:
+  - path: /home/seana/axolotl_project/data/cot_map_11x11_300to310.jsonl
+    type: alpaca
+
+val_set_size: 0.05 
+adapter: lora
+lora_r: 8
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - v_proj
+
+sequence_len: 512
+sample_packing: false
+pad_to_sequence_len: true
+
+output_dir: /home/seana/axolotl_project/outputs/phi2-CoT-finetune11x11_map
+
+# 載入先前 LoRA 訓練好的 adapter 權重
+adapter_path: /home/seana/axolotl_project/outputs/phi2-CoT-finetune11x11/checkpoint-400
+
+gradient_accumulation_steps: 2
+micro_batch_size: 4
+num_epochs: 2
+optimizer: adamw_bnb_8bit
+
+lr_scheduler: cosine
+learning_rate: 2e-4
+train_on_inputs: false
+group_by_length: true
+num_virtual_tokens: 32
+
+bf16: false
+fp16: true
+tf32: true
+
+gradient_checkpointing: true
+
+eval_steps: 10
+
+early_stopping_patience: 10
+logging_steps: 10
+save_steps: 50
+special_tokens:
+  pad_token: "<|endoftext|>"
