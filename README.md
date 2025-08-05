@@ -54,6 +54,9 @@ GPT-CoT/
 ├── data/                 # JSONL training files
 ├── outputs/              # Fine-tuned models (3 total)
 │   ├── phi2-CoT-finetune5/
+│   ├── phi2-CoT-finetune11x11/
+│   ├── phi2-CoT-finetune11x11_map/
+│   ├── phi2-Label-finetune1/
 │   ├── phi2-NLP-finetune1/
 │   └── phi2-vec-finetune/
 ├── source/               # Training and inference scripts
