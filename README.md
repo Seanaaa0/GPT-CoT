@@ -38,7 +38,7 @@ Each model is under `outputs/`, and each `.bin` file is under 100MB.
 |------------------------------|---------------|-----------------------------|--------------------------------------------------------------|
 | `phi2-CoT-finetune11x11`     | `(dx, dy)`    | CoT trace + final pos       | Trained on 11x11 map-free world, perfect accuracy            |
 | `phi2-CoT-finetune11x11_map` | `(dx, dy)`    | CoT trace + final pos + SG map | Input includes grid map with S, model returns final map with SG |
-| `phi2-Label-wall`            | `(dx, dy)`    | CoT trace + label           | Labeled path validity on map with wall (future extension)    |
+| `phi2-Label-finetune1`            | `(dx, dy)`    | CoT trace + label           | Labeled path validity on map with wall (future extension)    |
 
 ### 🏷️ Dataset Labels
 
