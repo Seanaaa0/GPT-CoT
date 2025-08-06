@@ -4,15 +4,15 @@ import json
 
 # === 輸入檔案名稱 ===
 input_files = [
-    "cot_10x10_1001to1200_99nlp.jsonl",
-    "cot_10x10_2001to2200_09nlp.jsonl",
-    "cot_10x10_3001to3200_90nlp.jsonl",
-    "cot_10x10_4001to4200_00nlp.jsonl",
-    "cot_10x10_5001to5200_55nlp.jsonl"
+    # "cot_10x10_1001to1200_99nlp.jsonl",
+    # "cot_10x10_2001to2200_09nlp.jsonl",
+    # "cot_10x10_3001to3200_90nlp.jsonl",
+    "nlp_10x10_multi_entre_shuffled3.jsonl",
+    "nlp_straight_andmore1.jsonl"
 ]
 
 # === 合併並打散後儲存路徑 ===
-output_file = "nlp_10x10_multi_entre_shuffled.jsonl"
+output_file = "nlp_straight_andmore1.jsonl"
 
 # === 讀取所有資料並合併 ===
 all_data = []

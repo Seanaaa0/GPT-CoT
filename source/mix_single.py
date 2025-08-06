@@ -3,8 +3,8 @@ import random
 
 
 # === 設定參數 ===
-input_file = "nlp_10x10_multi_entre_shuffled2.jsonl"  # 原始資料檔
-output_file = "nlp_10x10_multi_entre_shuffled2_mix.jsonl"  # 打亂後的新檔名
+input_file = "data/cot_map_11x11_311to313.jsonl"  # 原始資料檔
+output_file = "data/cot_map_11x11.jsonl_311to313"  # 打亂後的新檔名
 
 # === 讀取資料 ===
 with open(input_file, "r", encoding="utf-8") as f:

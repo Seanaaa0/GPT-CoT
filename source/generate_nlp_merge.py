@@ -6,24 +6,33 @@ from train_simple import simple_greedy_policy
 
 # === 可調整參數 ===
 SEED_RANGES = {
-    "00": (14001, 14010),
-    "09": (12001, 12010),
-    "90": (13001, 13010),
-    "99": (11001, 11010),
-    "55": (15001, 15010),
+    "16": (8001, 8100),
+    "81": (2001, 2100),
+    "67": (3001, 3100),
+    # "97": (1001, 1050),
+    # "40": (5001, 5050),
+    # "69": (6001, 6050),
+    # "82": (7001, 7050),
+    # "17": (8001, 8050),
+    # "23": (9001, 9050),
 }
 
 START_POSITIONS = {
-    "00": (0, 0),
-    "09": (0, 9),
-    "90": (9, 0),
-    "99": (9, 9),
-    "55": (5, 5),
+    "16": (1, 6),
+    "81": (8, 1),
+    "67": (6, 7),
+    # "97": (9, 7),
+    # "40": (4, 0),
+    # "69": (6, 9),
+    # "82": (8, 2),
+    # "17": (1, 7),
+    # "23": (2, 3),
+
 }
 
 SIZE = 10
 OUTPUT_DIR = "data"
-MERGED_OUTPUT_FILE = "nlp_10x10_multi_entre_shuffled2.jsonl"
+MERGED_OUTPUT_FILE = "nlp_10x10__shuffled4.jsonl"
 
 instruction_text = "Given a sequence of actions like 'right, down', infer the final position starting from (5,5) with clear reasoning."
 

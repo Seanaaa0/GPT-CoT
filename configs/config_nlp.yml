@@ -6,7 +6,7 @@ load_in_4bit: true
 strict: false
 
 datasets:
-  - path: /home/seana/axolotl_project/data/nlp_10x10_multi_entre_shuffled.jsonl
+  - path: /home/seana/axolotl_project/data/nlp_straight_andmore1.jsonl
     type: alpaca
 
 val_set_size: 0.05 # 沒有驗證集
@@ -22,14 +22,14 @@ sequence_len: 512
 sample_packing: false
 pad_to_sequence_len: true
 
-output_dir: /home/seana/axolotl_project/outputs/phi2-NLP-finetune1
+output_dir: /home/seana/axolotl_project/outputs/phi2-NLP-finetune2
 
 # 載入先前 LoRA 訓練好的 adapter 權重
-adapter_path: outputs/phi2-CoT-finetune5/checkpoint-760
+adapter_path: outputs/phi2-NLP-finetune1/checkpoint-952
 
 gradient_accumulation_steps: 2
 micro_batch_size: 4
-num_epochs: 8
+num_epochs: 10
 optimizer: adamw_bnb_8bit
 
 lr_scheduler: cosine

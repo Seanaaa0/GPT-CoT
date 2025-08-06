@@ -5,6 +5,9 @@ import random
 from maze_simple import SimpleEnv
 from train_simple import simple_greedy_policy
 
+# === 統一起點設定 ===
+start = (7, 2)  # ✅ 若為 None 則預設為中心點
+
 # === CoT 風格步驟轉換 ===
 
 
@@ -24,24 +27,26 @@ def generate_cot_steps(start, actions):
 
 def generate_cot_dataset(seed_start=1, seed_end=100, size=5, output_dir="data"):
     os.makedirs(output_dir, exist_ok=True)
-    output_name = f"cot_{size}x{size}_{seed_start}to{seed_end}_55.jsonl"
+
+    actual_start = start if start else (size // 2, size // 2)
+    sx, sy = actual_start
+    output_name = f"cot_{size}x{size}_{seed_start}to{seed_end}_{sx}{sy}.jsonl"
     output_path = os.path.join(output_dir, output_name)
 
-    instruction_pool = "Given a list of (dx, dy) actions starting from (0,0), calculate the final position step-by-step and explain each step clearly."
+    instruction_pool = "Given a list of (dx, dy) actions starting from (x,y), calculate the final position step-by-step and explain each step clearly."
 
     with open(output_path, "w", encoding="utf-8") as f:
         for seed in range(seed_start, seed_end + 1):
-            start = (size // 2, size // 2)
+            s = actual_start
             env = SimpleEnv(size=size, seed=seed)
-            env.start = start
+            env.start = s
             goal = env.get_goal()
-            actions = simple_greedy_policy(start, goal)
+            actions = simple_greedy_policy(s, goal)
             instruction = random.choice(instruction_pool)
-
             record = {
-                "instruction": instruction,
-                "input": "Start=(5,5)\nActions: " + ", ".join(actions),
-                "output": generate_cot_steps(start, actions)
+                "instruction": instruction_pool,
+                "input": f"Start=({s[0]},{s[1]})\nActions: " + ", ".join(actions),
+                "output": generate_cot_steps(s, actions)
             }
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
 

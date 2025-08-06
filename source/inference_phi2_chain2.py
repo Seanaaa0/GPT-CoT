@@ -9,9 +9,9 @@ import os
 
 # === 設定 ===
 base_model_path = "/home/seana/axolotl_project/models/phi-2/phi2"
-lora_checkpoint_path = "/home/seana/axolotl_project/outputs/phi2-CoT-finetune6/checkpoint-24"
+lora_checkpoint_path = "/home/seana/axolotl_project/outputs/phi2-CoT-finetune5/checkpoint-760"
 test_data_path = "/home/seana/axolotl_project/data/random_multi_3.jsonl"
-output_save_path = "/home/seana/axolotl_project/source/test_output/multi_test_3.jsonl"
+output_save_path = "/home/seana/axolotl_project/source/test_output/multi_test_4.jsonl"
 max_tokens = 512
 # 增加輸出長度以支援 chain-of-thought
 
@@ -41,7 +41,7 @@ os.makedirs(os.path.dirname(output_save_path), exist_ok=True)
 
 with open(test_data_path, "r", encoding="utf-8") as f:
     for i, line in enumerate(f):
-        if i >= 10:
+        if i >= 20:
             break
         data = json.loads(line)
         instruction = data["instruction"]

@@ -1,4 +1,3 @@
-
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 import torch
@@ -10,22 +9,33 @@ import os
 # === 設定 ===
 base_model_path = "/home/seana/axolotl_project/models/phi-2/phi2"
 lora_checkpoint_path = "/home/seana/axolotl_project/outputs/phi2-NLP-finetune1/checkpoint-952"
-test_data_path = "/home/seana/axolotl_project/data/random_multi_3.jsonl"
-output_save_path = "/home/seana/axolotl_project/source/test_output/multi_nlp1.jsonl"
+test_data_path = "/home/seana/axolotl_project/data/nlp_10x10__shuffled4.jsonl"
+output_save_path = "/home/seana/axolotl_project/source/test_output/test_nlp4.jsonl"
 max_tokens = 512
-# 增加輸出長度以支援 chain-of-thought
 
-# === 載入 tokenizer ===
+# === 強制使用 CPU ===
+device = "cpu"
+torch_dtype = torch.float32
+
+# === 載入 tokenizer 與模型（用 CPU）===
 tokenizer = AutoTokenizer.from_pretrained(
     base_model_path, trust_remote_code=True)
+
 model = AutoModelForCausalLM.from_pretrained(
     base_model_path,
-    device_map={"": "cpu"},
-    torch_dtype=torch.float32
-)
+    torch_dtype=torch_dtype,
+    device_map={"": "cpu"}
+).to(device)
+
 model = PeftModel.from_pretrained(
-    model, lora_checkpoint_path, device_map={"": "cpu"})
+    model,
+    lora_checkpoint_path,
+    device_map={"": "cpu"}
+).to(device)
+
 model.eval()
+
+# === 回傳推論內容 ===
 
 
 def extract_full_trace(text, prompt):
@@ -41,7 +51,7 @@ os.makedirs(os.path.dirname(output_save_path), exist_ok=True)
 
 with open(test_data_path, "r", encoding="utf-8") as f:
     for i, line in enumerate(f):
-        if i >= 10:
+        if i >= 20:
             break
         data = json.loads(line)
         instruction = data["instruction"]
@@ -58,7 +68,6 @@ with open(test_data_path, "r", encoding="utf-8") as f:
             "...\n"
             "Final position: (x,y)\n\n"
             "Be careful to base each step on the result of the previous one.\n"
-
         )
 
         prompt = prefix + \
@@ -68,7 +77,7 @@ with open(test_data_path, "r", encoding="utf-8") as f:
 
         with torch.no_grad():
             output_raw = model.generate(
-                **tokenizer(prompt, return_tensors="pt").to(model.device),
+                **tokenizer(prompt, return_tensors="pt").to(device),
                 max_new_tokens=max_tokens,
                 eos_token_id=tokenizer.eos_token_id,
                 do_sample=False
@@ -79,13 +88,11 @@ with open(test_data_path, "r", encoding="utf-8") as f:
         end = time.time()
 
         # === 抓模型生成的預測位置 ===
-        # 優先從 "Final position" 擷取
         match = re.search(
             r"Final position:\s*\((\-?\d+),\s*(\-?\d+)\)", full_trace)
         if match:
             predicted = f"({match.group(1)},{match.group(2)})"
         else:
-            # 沒有 Final position 就抓最後一個 Step 的加總算出位置
             last_add = re.findall(
                 r"Step \d+: \((\-?\d+),\s*(\-?\d+)\) \+ \((\-?\d+),\s*(\-?\d+)\)", full_trace)
             if last_add:
@@ -94,7 +101,6 @@ with open(test_data_path, "r", encoding="utf-8") as f:
             else:
                 predicted = "[INVALID]"
 
-        # === 抓 Ground Truth ===
         match = re.search(
             r"Final position:\s*\((\-?\d+),\s*(\-?\d+)\)", expected)
         if match:
@@ -104,7 +110,6 @@ with open(test_data_path, "r", encoding="utf-8") as f:
                 r"Step \d+: .*→\s*\((\-?\d+),\s*(\-?\d+)\)", expected)
             expected_final = f"({fallback[-1][0]},{fallback[-1][1]})" if fallback else "[INVALID]"
 
-        # === 比對結果 ===
         is_correct = predicted == expected_final
         correct += is_correct
         total += 1

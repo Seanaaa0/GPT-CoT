@@ -1,6 +1,9 @@
 # 忽略模型與輸出資料夾
 models/
-outputs/
+outputs/*
+!outputs/phi2-CoT-finetune5/**
+!outputs/phi2-NLP-finetune1/**
+!outputs/phi2-vec-finetune/**
 
 # 忽略常見大檔案格式
 *.bin

@@ -10,7 +10,7 @@ import os
 base_model_path = "/home/seana/axolotl_project/models/phi-2/phi2"
 lora_checkpoint_path = "/home/seana/axolotl_project/outputs/phi2-Label-finetune1/checkpoint-150"
 test_data_path = "/home/seana/axolotl_project/source/data/10x10_test_labeled1.jsonl"
-output_save_path = "/home/seana/axolotl_project/source/data/test_output/test_label.jsonl"
+output_save_path = "/home/seana/axolotl_project/source/data/test_output/test_label2.jsonl"
 max_tokens = 512
 
 device = "cpu"
@@ -40,7 +40,7 @@ os.makedirs(os.path.dirname(output_save_path), exist_ok=True)
 
 with open(test_data_path, "r", encoding="utf-8") as f:
     for i, line in enumerate(f):
-        if i >= 5:
+        if i >= 20:
             break
         data = json.loads(line)
         instruction = data["instruction"]
