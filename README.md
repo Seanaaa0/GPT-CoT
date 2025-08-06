@@ -2,12 +2,16 @@
 # GPT-CoT
 
 A lightweight fine-tuning project using `phi-2` + LoRA to teach a model how to reason over a grid using Chain-of-Thought (CoT) and simple spatial reasoning.
-
-This project trains a small language model to perform step-by-step 2D navigation using either:
-- vector actions like (+1,0)
-- NLP directions like "up", "left"
-
 ---
+## Description
+Train a lightweight Phi‑2 model using LoRA to perform chain‑of‑thought reasoning on 2D grid maps. Solve simple maze or spatial planning problems step by step.
+
+## Highlights
+-  Grid‑based visual reasoning using spatial CoT prompts
+-  LoRA fine‑tuning to keep compute and model size low
+-  Example maze puzzles with Web UI (`map_interface.html`)
+-  Training and evaluation scripts included (`plot_trainer_state_cli.py`, `flask_api.py`)
+
 
 ##  Project Goal
 
